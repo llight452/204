@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Renewable Energy & Urban Economic Growth — Chicago MSA</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --primary:#667eea;
+  --secondary:#764ba2;
+  --accent:#f093fb;
+  --warning:#ffc107;
+  --success:#4caf50;
+  --danger:#f44336;
+  --teal:#26c6da;
+}
+
+html{scroll-behavior:smooth;}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:#000;
+  color:#fff;
+  overflow-x:hidden;
+}
+
+.bg-canvas{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:0;
+  background:radial-gradient(ellipse at top,#1a1a2e 0%,#0a0a0a 50%,#000 100%);
+}
+
+.orb-container{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;overflow:hidden;pointer-events:none;}
+
+.orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:0;animation:orbFloat 25s infinite ease-in-out;}
+.orb-1{width:600px;height:600px;background:radial-gradient(circle,var(--primary),transparent);top:-20%;left:-10%;animation-delay:0s;}
+.orb-2{width:500px;height:500px;background:radial-gradient(circle,var(--accent),transparent);bottom:-15%;right:-10%;animation-delay:8s;}
+.orb-3{width:400px;height:400px;background:radial-gradient(circle,var(--secondary),transparent);top:40%;right:20%;animation-delay:16s;}
+
+@keyframes orbFloat{
+  0%,100%{transform:translate(0,0) scale(1);opacity:.15;}
+  25%{transform:translate(100px,-150px) scale(1.2);opacity:.25;}
+  50%{transform:translate(-50px,100px) scale(.9);opacity:.2;}
+  75%{transform:translate(150px,50px) scale(1.1);opacity:.18;}
+}
+
+.noise{position:fixed;top:0;left:0;width:100%;height:100%;opacity:.03;z-index:1000;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+.container{position:relative;z-index:10;width:100%;}
+
+section{
+  width:100%;min-height:100vh;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  padding:60px 80px;
+  opacity:0;transform:translateY(60px);
+  transition:opacity 1.2s cubic-bezier(.25,.46,.45,.94),transform 1.2s cubic-bezier(.25,.46,.45,.94);
+}
+section.visible{opacity:1;transform:translateY(0);}
+
+.hero-title{
+  font-size:clamp(2.2rem,5vw,4.5rem);font-weight:900;
+  background:linear-gradient(135deg,#fff 0%,var(--primary) 60%,var(--accent) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:12px;letter-spacing:-.04em;line-height:1.15;text-align:center;
+  animation:titleGlow 3s ease-in-out infinite;
+}
+
+.hero-subtitle-small{font-size:.9rem;color:rgba(255,255,255,.45);font-weight:300;margin-bottom:6px;letter-spacing:.05em;text-align:center;}
+
+@keyframes titleGlow{
+  0%,100%{filter:drop-shadow(0 0 40px rgba(102,126,234,.4));}
+  50%{filter:drop-shadow(0 0 60px rgba(240,147,251,.6));}
+}
+
+.team-hero{
+  background:linear-gradient(135deg,rgba(102,126,234,.12) 0%,rgba(118,75,162,.08) 100%);
+  backdrop-filter:blur(30px);
+  border:.5px solid rgba(255,255,255,.15);
+  border-radius:28px;padding:28px 44px;max-width:720px;
+  box-shadow:0 20px 60px rgba(102,126,234,.25),inset 0 1px 0 rgba(255,255,255,.1);
+  text-align:center;margin-top:24px;
+}
+
+.team-name{font-size:1.2em;font-weight:700;margin-bottom:10px;background:linear-gradient(135deg,#fff,rgba(255,255,255,.7));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.member-tag{display:inline-block;background:rgba(255,255,255,.08);border:.5px solid rgba(255,255,255,.2);border-radius:16px;padding:7px 18px;font-size:.85em;font-weight:500;}
+.vision-text{margin-top:14px;font-size:.82em;color:rgba(255,255,255,.5);font-style:italic;line-height:1.6;}
+
+.section-header{
+  font-size:clamp(1.8rem,4vw,3.2rem);font-weight:800;
+  background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,.75) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:24px;letter-spacing:-.03em;text-align:center;
+}
+
+.content-wrapper{max-width:1200px;width:100%;display:flex;flex-direction:column;justify-content:center;}
+
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:16px 0;}
+.stats-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0;}
+
+.stat-card{
+  background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,rgba(255,255,255,.02) 100%);
+  backdrop-filter:blur(20px);
+  border:.5px solid rgba(255,255,255,.12);
+  border-radius:20px;padding:24px 20px;text-align:center;
+  transition:all .5s cubic-bezier(.25,.46,.45,.94);
+}
+.stat-card:hover{transform:translateY(-8px) scale(1.03);box-shadow:0 20px 50px rgba(102,126,234,.3);}
+
+.stat-number{
+  font-size:2.5em;font-weight:900;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:6px;
+}
+.stat-label{font-size:.68em;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.5);font-weight:600;}
+
+.glass-card{
+  background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,rgba(255,255,255,.02) 100%);
+  backdrop-filter:blur(30px);
+  border:.5px solid rgba(255,255,255,.15);
+  border-radius:20px;padding:22px 28px;margin:10px 0;
+  transition:all .5s ease;
+}
+.glass-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(102,126,234,.2);}
+
+.card-title{font-size:1.05em;font-weight:700;margin-bottom:8px;color:#fff;}
+.card-text{font-size:.85em;line-height:1.65;color:rgba(255,255,255,.75);}
+
+.key-insight{
+  background:linear-gradient(135deg,rgba(255,193,7,.12) 0%,rgba(255,152,0,.06) 100%);
+  border-left:3px solid var(--warning);
+  border-radius:20px;padding:20px 26px;margin:14px 0;
+  box-shadow:0 10px 40px rgba(255,193,7,.15);
+}
+.key-insight-text{font-size:.88em;font-weight:500;color:rgba(255,255,255,.9);line-height:1.6;}
+
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin:12px 0;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:12px 0;}
+
+.mini-card{background:rgba(255,255,255,.04);border:.5px solid rgba(255,255,255,.1);border-radius:14px;padding:16px 20px;margin:6px 0;}
+.mini-card h4{margin-bottom:6px;font-size:.88em;}
+
+ul{list-style:none;margin:8px 0;}
+li{position:relative;padding-left:24px;margin-bottom:7px;color:rgba(255,255,255,.8);line-height:1.55;font-size:.85em;}
+li::before{content:'→';position:absolute;left:0;color:var(--primary);font-weight:700;}
+
+.option-card{
+  background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,rgba(255,255,255,.02) 100%);
+  backdrop-filter:blur(20px);
+  border:.5px solid rgba(255,255,255,.12);
+  border-radius:18px;padding:16px 22px;margin:8px 0;
+  transition:all .4s ease;
+  display:flex;align-items:center;gap:16px;
+}
+.option-card:hover{transform:translateX(10px);box-shadow:0 15px 50px rgba(102,126,234,.25);}
+
+.option-number{
+  min-width:42px;height:42px;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  border-radius:12px;font-weight:800;font-size:1.1em;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 20px rgba(102,126,234,.3);flex-shrink:0;
+}
+.option-title{font-size:.95em;font-weight:700;color:#fff;margin-bottom:3px;}
+.option-desc{color:rgba(255,255,255,.65);font-size:.8em;line-height:1.5;}
+
+.competency-box{
+  background:linear-gradient(135deg,rgba(76,175,80,.1) 0%,rgba(76,175,80,.03) 100%);
+  border-left:3px solid var(--success);padding:18px 22px;border-radius:14px;
+}
+.competency-box.weakness{
+  background:linear-gradient(135deg,rgba(244,67,54,.1) 0%,rgba(244,67,54,.03) 100%);
+  border-left:3px solid var(--danger);
+}
+.competency-box.neutral{
+  background:linear-gradient(135deg,rgba(102,126,234,.1) 0%,rgba(102,126,234,.03) 100%);
+  border-left:3px solid var(--primary);
+}
+.competency-title{font-size:.92em;font-weight:700;margin-bottom:8px;color:#fff;}
+
+.quote-block{
+  border-left:3px solid var(--primary);
+  padding:16px 22px;margin:14px 0;
+  background:rgba(102,126,234,.08);
+  border-radius:0 14px 14px 0;
+  font-style:italic;
+  color:rgba(255,255,255,.85);
+  font-size:.9em;line-height:1.65;
+}
+
+.matrix-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.82em;}
+.matrix-table th{background:rgba(102,126,234,.2);border:1px solid rgba(255,255,255,.15);padding:12px 16px;font-size:.82em;font-weight:600;color:rgba(255,255,255,.9);text-align:center;}
+.matrix-table td{border:1px solid rgba(255,255,255,.1);padding:11px 16px;font-size:.82em;color:rgba(255,255,255,.75);text-align:center;vertical-align:middle;}
+.highlight-cell{background:linear-gradient(135deg,rgba(76,175,80,.25),rgba(76,175,80,.08)) !important;color:#fff !important;font-weight:700;}
+.warn-cell{background:linear-gradient(135deg,rgba(255,193,7,.2),rgba(255,193,7,.05)) !important;color:#fff !important;font-weight:600;}
+.danger-cell{background:linear-gradient(135deg,rgba(244,67,54,.2),rgba(244,67,54,.05)) !important;color:#fff !important;font-weight:600;}
+
+.fade-in{opacity:0;transform:translateY(40px);transition:opacity 1s ease,transform 1s ease;}
+.fade-in.visible{opacity:1;transform:translateY(0);}
+
+strong{color:#fff;font-weight:700;}
+em{color:rgba(255,255,255,.9);font-style:italic;}
+
+/* References two-column no-scroll */
+.ref-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2px 24px;
+  margin-top:12px;
+}
+.ref-item{
+  font-size:.67em;
+  color:rgba(255,255,255,.65);
+  line-height:1.45;
+  padding:4px 0 4px 14px;
+  border-bottom:.5px solid rgba(255,255,255,.05);
+  text-indent:-14px;
+}
+
+@media(max-width:900px){
+  section{padding:40px 24px;}
+  .stats-grid,.stats-grid-3,.grid-2,.grid-3{grid-template-columns:1fr;}
+  .hero-title{font-size:2rem;}
+  .ref-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-canvas"></div>
+<div class="orb-container">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div class="noise"></div>
+
+<div class="container">
+
+<!-- ════════════ SLIDE 1 · TITLE ════════════ -->
+<section class="visible" id="s1" style="text-align:center;">
+  <h1 class="hero-title">Renewable Energy Development<br>and Urban Economic Growth</h1>
+  <p class="hero-subtitle-small">The Case of the Chicago Metropolitan Area · 2015-2026</p>
+  <div class="team-hero">
+    <div class="team-name">Andrei Volodin</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:10px 0;">
+      <div class="member-tag">Final Project Presentation</div>
+    </div>
+    <p class="vision-text">
+      An empirical investigation into the relationship between clean energy infrastructure<br>
+      and metropolitan economic performance across property markets, labor dynamics,<br>
+      and entrepreneurial activity in the Chicago MSA
+    </p>
+  </div>
+</section>
+
+<!-- ════════════ SLIDE 2 · INTRODUCTION ════════════ -->
+<section class="fade-in" id="s2">
+  <div class="content-wrapper">
+    <h2 class="section-header">Why This Research Matters</h2>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">$278B</div>
+        <div class="stat-label">New clean energy<br>projects post-IRA 2022</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">4.5%</div>
+        <div class="stat-label">Clean energy job growth<br>in 2024 · 3X economy</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">+20%</div>
+        <div class="stat-label">Illinois electricity rates<br>2021-2024</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">129K</div>
+        <div class="stat-label">Clean energy workers<br>in Illinois · #5 nationally</div>
+      </div>
+    </div>
+
+    <div class="key-insight">
+      <p class="key-insight-text"><strong>Research Gap:</strong> Existing literature concentrates on California and Sun Belt cities. Midwest urban contexts - with different industrial histories, climates, and policy environments - are understudied. The Chicago MSA is the ideal natural laboratory: cross-county variation in renewable adoption creates a quasi-experimental setting.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="glass-card">
+        <h3 class="card-title">Three Economic Channels</h3>
+        <ul>
+          <li>Employment generation in green technology sectors</li>
+          <li>Residential property value appreciation</li>
+          <li>New business formation in clean energy industries</li>
+        </ul>
+      </div>
+      <div class="glass-card">
+        <h3 class="card-title">Chicago MSA Advantage</h3>
+        <ul>
+          <li>Lake Michigan wind resources (17-20 mph at hub height)</li>
+          <li>FEJA (2016) + CEJA (2021) policy environment</li>
+          <li>5-county variation: DuPage 21.7 installs/ZIP vs. Kane 7.4</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ SLIDE 3 · OBJECTIVES & HYPOTHESIS ════════════ -->
+<section class="fade-in" id="s3">
+  <div class="content-wrapper">
+    <h2 class="section-header">What This Study Set Out to Answer</h2>
+
+    <div class="quote-block" style="font-size:1em;font-style:normal;font-weight:500;">
+      <strong>Research Question:</strong> How does renewable energy infrastructure development influence economic growth in the Chicago MSA, as measured by property value appreciation, clean energy employment growth, and new business formation?
+    </div>
+
+    <div class="grid-3" style="margin-top:14px;">
+      <div class="option-card" style="flex-direction:column;align-items:flex-start;gap:10px;">
+        <span class="option-number" style="font-size:.75em;">OBJ 1</span>
+        <div>
+          <div class="option-title">Property Values</div>
+          <div class="option-desc">Decade-long home value appreciation across 324 ZIP codes measured using Zillow ZHVI</div>
+        </div>
+      </div>
+      <div class="option-card" style="flex-direction:column;align-items:flex-start;gap:10px;">
+        <span class="option-number" style="font-size:.75em;">OBJ 2</span>
+        <div>
+          <div class="option-title">Employment</div>
+          <div class="option-desc">Clean energy job growth tracked at county level using BLS QCEW</div>
+        </div>
+      </div>
+      <div class="option-card" style="flex-direction:column;align-items:flex-start;gap:10px;">
+        <span class="option-number" style="font-size:.75em;">OBJ 3</span>
+        <div>
+          <div class="option-title">Business Formation</div>
+          <div class="option-desc">New clean energy firm registrations quantified via Census BFS</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="key-insight" style="margin-top:10px;">
+      <p class="key-insight-text">
+        <strong>Central Hypothesis:</strong> ZIP codes and counties with greater renewable energy installations exhibit <em>stronger economic performance across all three indicators</em> after controlling for population density and median household income. The association is amplified in the post-CEJA period (after 2021).
+      </p>
+    </div>
+
+    <div class="glass-card" style="margin-top:10px;">
+      <h3 class="card-title">Study Contribution</h3>
+      <p class="card-text">A longitudinal, multi-indicator, multi-county analysis filling the Midwest geographic gap. Includes interaction term (Solar x Post-CEJA) for policy-mediated effects, sub-period robustness checks separating results from the COVID housing shock, and equity analysis by income quintile.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ SLIDE 4 · LITERATURE REVIEW ════════════ -->
+<section class="fade-in" id="s4">
+  <div class="content-wrapper">
+    <h2 class="section-header">What the Evidence Shows</h2>
+
+    <div class="grid-2">
+      <div class="competency-box">
+        <h3 class="competency-title">&#10003; Positive Relationships</h3>
+        <ul>
+          <li><strong>Pollin et al.:</strong> Renewables generate 16.7 jobs/$1M vs. 5.3 in fossil fuels</li>
+          <li><strong>Kammen et al.:</strong> +3-4% property values near solar in CA cities</li>
+          <li><strong>Dastrup et al.:</strong> 3-4% solar premium using Zillow data specifically</li>
+          <li><strong>Hoen et al.:</strong> No negative property effect from wind in dense areas</li>
+        </ul>
+      </div>
+      <div class="competency-box weakness">
+        <h3 class="competency-title">&#10007; Negative or Null Relationships</h3>
+        <ul>
+          <li><strong>Menz &amp; Vachon:</strong> No wind-employment link at state level; temporary jobs only</li>
+          <li><strong>Adelaja &amp; McKeown:</strong> -5 to -10% property values near rural wind turbines</li>
+          <li><strong>Carley et al.:</strong> Weak solar/wind correlation with GDP after controlling baseline</li>
+          <li><strong>Sovacool &amp; Watts:</strong> Benefits concentrate in high-income households</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="glass-card" style="margin-top:12px;">
+      <h3 class="card-title">Theoretical Framework - Three Mechanisms, Three Outcomes</h3>
+      <div class="grid-3" style="margin-top:8px;">
+        <div class="mini-card">
+          <h4 style="color:var(--primary);">Roback (1982)</h4>
+          <p class="card-text">Spatial equilibrium: households bid up land prices for lower energy costs + green amenities - <em>property value channel</em></p>
+        </div>
+        <div class="mini-card">
+          <h4 style="color:var(--accent);">Krugman (1991)</h4>
+          <p class="card-text">Agglomeration: new industries create clustering, attract skilled workers, generate increasing returns - <em>employment channel</em></p>
+        </div>
+        <div class="mini-card">
+          <h4 style="color:var(--teal);">Porter (1990)</h4>
+          <p class="card-text">Cluster theory: geographic concentration accelerates entrepreneurial entry and innovation - <em>business formation channel</em></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="key-insight" style="margin-top:10px;">
+      <p class="key-insight-text"><strong>Key synthesis:</strong> Benefits materialize only where industrial capacity, labor market depth, and policy institutions are sufficient. Chicago's established base positions it more favorably than rural contexts where negative effects dominate.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ SLIDE 5 · DATA & METHODS ════════════ -->
+<section class="fade-in" id="s5">
+  <div class="content-wrapper">
+    <h2 class="section-header">How It Was Measured</h2>
+
+    <div class="grid-2">
+      <div>
+        <div class="option-card">
+          <span class="option-number" style="font-size:.7em;letter-spacing:-.5px;">ZHVI</span>
+          <div>
+            <div class="option-title">Zillow Home Value Index</div>
+            <div class="option-desc">324 ZIP codes - repeat-sales methodology - 2015-2024</div>
+          </div>
+        </div>
+        <div class="option-card">
+          <span class="option-number" style="font-size:.7em;">BLS</span>
+          <div>
+            <div class="option-title">BLS QCEW Employment</div>
+            <div class="option-desc">NAICS 2211, 2371, 3559, 5416 - cross-referenced with DOE methodology</div>
+          </div>
+        </div>
+        <div class="option-card">
+          <span class="option-number" style="font-size:.7em;">BFS</span>
+          <div>
+            <div class="option-title">Census Business Formation Stats</div>
+            <div class="option-desc">New EIN registrations under clean energy NAICS codes - county level</div>
+          </div>
+        </div>
+        <div class="option-card">
+          <span class="option-number" style="font-size:.7em;">EIA</span>
+          <div>
+            <div class="option-title">EIA State Energy Data</div>
+            <div class="option-desc">Solar PV (MW + count) + wind capacity - county level - 2015-2024</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="glass-card">
+          <h3 class="card-title">OLS Regression Specification</h3>
+          <div style="background:rgba(0,0,0,.4);border-radius:10px;padding:14px;font-family:monospace;font-size:.78em;color:rgba(255,255,255,.85);line-height:1.7;margin:8px 0;">
+            Y<sub>i</sub> = &#946;&#8320; + &#946;&#8321;(Solar<sub>i</sub>) + &#946;&#8322;(Wind<sub>i</sub>) +<br>
+            &#946;&#8323;(Income<sub>i</sub>) + &#946;&#8324;(Density<sub>i</sub>) +<br>
+            &#946;&#8325;(Solar<sub>i</sub> x Post-CEJA<sub>i</sub>) + &#949;<sub>i</sub>
+          </div>
+          <p class="card-text" style="font-size:.78em;">3 dependent variables: home value delta %, employment delta %, new firm count - N=324 ZIP codes - Robust SE - VIF 1.3-2.4</p>
+        </div>
+
+        <div class="key-insight" style="margin-top:10px;">
+          <p class="key-insight-text" style="font-size:.82em;"><strong>Transparency note:</strong> Wind capacity is county-level (N=5) assigned to ZIP-level regressions - a multilevel limitation acknowledged explicitly. Moran's I = 0.18 (p&lt;0.05) indicates moderate spatial autocorrelation; spatial lag robustness checks discussed in limitations.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ SLIDE 6 · RESULTS PART 1 ════════════ -->
+<section class="fade-in" id="s6">
+  <div class="content-wrapper">
+    <h2 class="section-header">What the Data Shows</h2>
+
+    <div class="grid-3" style="margin-bottom:12px;">
+      <div class="stat-card">
+        <div class="stat-number" style="font-size:2em;">+52.7%</div>
+        <div class="stat-label">DuPage home value<br>(21.7 installs/ZIP)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" style="color:var(--warning);background:none;-webkit-text-fill-color:initial;">+34.5%</div>
+        <div class="stat-label">Kane home value<br>(7.4 installs/ZIP)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" style="font-size:2em;">+91.5%</div>
+        <div class="stat-label">MSA clean energy<br>employment growth</div>
+      </div>
+    </div>
+
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>County</th>
+          <th>Solar Installs/ZIP</th>
+          <th>Home Value 2015-24</th>
+          <th>Employment Growth</th>
+          <th>New Firms 2020-24</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:600;color:#fff;">Cook</td>
+          <td>14.3</td>
+          <td class="warn-cell">+43.2%</td>
+          <td>+80.3%</td>
+          <td>589</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#fff;">DuPage</td>
+          <td class="highlight-cell">21.7</td>
+          <td class="highlight-cell">+52.7%</td>
+          <td class="highlight-cell">+105.5%</td>
+          <td class="highlight-cell">398</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#fff;">Lake</td>
+          <td>18.2</td>
+          <td>+47.9%</td>
+          <td class="highlight-cell">+124.7%</td>
+          <td>271</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#fff;">Kane</td>
+          <td class="danger-cell">7.4</td>
+          <td class="danger-cell">+34.5%</td>
+          <td class="danger-cell">+81.3%</td>
+          <td class="danger-cell">98</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#fff;">Will</td>
+          <td class="danger-cell">8.9</td>
+          <td>+40.8%</td>
+          <td>+86.8%</td>
+          <td>127</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="key-insight" style="margin-top:10px;">
+      <p class="key-insight-text"><strong>Lake County outlier:</strong> +124.7% employment growth despite modest solar (18.2 installs/ZIP) - driven by wind energy via Lake Michigan access. Confirms wind operates through the <em>employment channel</em>, not property values.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ SLIDE 7 · RESULTS PART 2 ════════════ -->
+<section class="fade-in" id="s7">
+  <div class="content-wrapper">
+    <h2 class="section-header">Regression Results &amp; Validation</h2>
+
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Home Value Delta</th>
+          <th>Employment Delta</th>
+          <th>New Firms</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align:left;font-weight:600;color:rgba(255,255,255,.9);">Solar Installs/ZIP</td>
+          <td class="highlight-cell">0.43*** (0.07)</td>
+          <td class="highlight-cell">0.31*** (0.06)</td>
+          <td class="highlight-cell">0.27** (0.09)</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;color:rgba(255,255,255,.9);">Wind Capacity (MW)</td>
+          <td>0.11 (0.08) ns</td>
+          <td class="highlight-cell">0.38*** (0.07)</td>
+          <td class="warn-cell">0.19* (0.10)</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;color:rgba(255,255,255,.9);">Solar x Post-CEJA</td>
+          <td class="warn-cell">0.19** (0.08)</td>
+          <td class="highlight-cell">0.24*** (0.07)</td>
+          <td class="highlight-cell">0.31*** (0.09)</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;">Controls (Income, Density)</td>
+          <td>sig.</td>
+          <td>sig.</td>
+          <td>sig.</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;">R&#178;</td>
+          <td>0.71</td>
+          <td>0.68</td>
+          <td>0.64</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="grid-2" style="margin-top:12px;">
+      <div class="glass-card">
+        <h3 class="card-title">Robustness: Sub-Period Test</h3>
+        <p class="card-text">DuPage > Lake > Cook > Will > Kane rank ordering holds across all three intervals: 2015-19 (pre-pandemic), 2020-22 (shock), 2022-24. The association is <strong>not an artifact</strong> of the COVID housing boom.</p>
+      </div>
+      <div class="glass-card">
+        <h3 class="card-title">Equity Dimension</h3>
+        <p class="card-text">Solar coefficient in bottom income quintile ZIP codes: <span style="color:var(--warning);font-weight:700;">b = 0.19</span> vs. MSA-wide <span style="color:var(--success);font-weight:700;">b = 0.43</span>. Benefits concentrate in wealthy areas - reinforcing the case for targeted low-income programs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ SLIDE 8 · CONCLUSIONS & POLICY ════════════ -->
+<section class="fade-in" id="s8">
+  <div class="content-wrapper">
+    <h2 class="section-header">What It All Means</h2>
+
+    <div class="key-insight">
+      <p class="key-insight-text"><strong>Core Finding:</strong> Solar adoption is positively and significantly associated with stronger property value appreciation, employment growth, and business formation across all specifications. Wind energy contributes primarily through labor markets (not property values). CEJA policy amplifies returns - especially for firm formation (b=0.31***). The relationship is robust to sub-period decomposition and not reducible to COVID housing shock effects.</p>
+    </div>
+
+    <div class="grid-2" style="margin-top:14px;">
+      <div>
+        <div class="option-card">
+          <span class="option-number" style="font-size:.65em;letter-spacing:-.5px;">KW</span>
+          <div>
+            <div class="option-title">Kane &amp; Will: Targeted Solar Incentives</div>
+            <div class="option-desc">Address structural barriers - multi-family housing, thin community solar coverage - not broad permitting reform</div>
+          </div>
+        </div>
+        <div class="option-card">
+          <span class="option-number" style="font-size:.65em;letter-spacing:-.5px;">LK</span>
+          <div>
+            <div class="option-title">Lake Michigan Offshore Wind</div>
+            <div class="option-desc">Lake County's 124.7% employment growth is the proof of concept; accelerate Illinois Power Agency permitting</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="option-card">
+          <span class="option-number" style="font-size:.65em;letter-spacing:-.5px;">CK</span>
+          <div>
+            <div class="option-title">Cook County Equity Programs</div>
+            <div class="option-desc">Link clean energy job training to small business development for low-income communities; b=0.19 vs. 0.43 gap demands policy action</div>
+          </div>
+        </div>
+        <div class="option-card">
+          <span class="option-number" style="font-size:.65em;letter-spacing:-.5px;">DA</span>
+          <div>
+            <div class="option-title">Better Data Infrastructure</div>
+            <div class="option-desc">Systematic ZIP-level tracking of clean energy employment + property markets for ongoing evidence-based evaluation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card" style="margin-top:12px;">
+      <h3 class="card-title">Future Research Roadmap</h3>
+      <div class="grid-3">
+        <div style="font-size:.78em;color:rgba(255,255,255,.7);">
+          <strong style="color:var(--primary);">DiD Design</strong><br>Illinois vs. Wisconsin/Indiana ZIP codes - CEJA 2021 as natural experiment
+        </div>
+        <div style="font-size:.78em;color:rgba(255,255,255,.7);">
+          <strong style="color:var(--accent);">IV Strategy</strong><br>NASA solar irradiance + NREL wind speed as instruments for adoption
+        </div>
+        <div style="font-size:.78em;color:rgba(255,255,255,.7);">
+          <strong style="color:var(--teal);">HLM Model</strong><br>ZIP codes nested in counties - properly address wind county/ZIP mismatch
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ SLIDE 9 · REFERENCES ════════════ -->
+<section class="fade-in" id="s9">
+  <div class="content-wrapper">
+    <h2 class="section-header" style="margin-bottom:10px;">References</h2>
+
+    <div class="ref-grid">
+      <p class="ref-item">Adelaja, S., &amp; McKeown, C. (2013). Effects of wind farms on property values in agricultural communities. <em>Land Economics, 89</em>(3), 444-459.</p>
+      <p class="ref-item">Brown, M. A., Southworth, F., &amp; Sarzynski, A. (2012). <em>Shrinking the carbon footprint of metropolitan America.</em> Brookings Institution.</p>
+      <p class="ref-item">Bureau of Labor Statistics. (2025). <em>Quarterly Census of Employment and Wages.</em> U.S. Dept. of Labor.</p>
+      <p class="ref-item">Carley, S., Lawrence, S., Brown, A., et al. (2011). Energy-based economic development. <em>Renewable &amp; Sustainable Energy Reviews, 15</em>(1), 282-295.</p>
+      <p class="ref-item">Dallas Federal Reserve Bank. (2025). Renewable energy jobs surge, though data differ. <em>Dallas Fed Economic Letter.</em></p>
+      <p class="ref-item">Dastrup, S. R., Zivin, J. G., Costa, D. L., &amp; Kahn, M. E. (2012). Understanding the solar home price premium. <em>European Economic Review, 56</em>(5), 961-973.</p>
+      <p class="ref-item">E2 (Environmental Entrepreneurs). (2024). <em>Clean jobs America 2024.</em> BW Research Partnership.</p>
+      <p class="ref-item">Hoen, B., Wiser, R., Cappers, P., et al. (2011). Wind energy facilities and residential properties. <em>Journal of Real Estate Research, 33</em>(3), 279-316.</p>
+      <p class="ref-item">Illinois Clean Jobs Coalition. (2024). <em>Illinois home to 129K clean energy jobs, #5 in US.</em></p>
+      <p class="ref-item">Illinois Public Act 99-0906. (2016). <em>Future Energy Jobs Act.</em> Illinois General Assembly.</p>
+      <p class="ref-item">Illinois Public Act 102-0662. (2021). <em>Climate and Equitable Jobs Act.</em> Illinois General Assembly.</p>
+      <p class="ref-item">Kammen, D. M., Kapadia, K., &amp; Fripp, M. (2004). <em>Putting renewables to work.</em> RAEL Report, UC Berkeley.</p>
+      <p class="ref-item">Krugman, P. (1991). Increasing returns and economic geography. <em>Journal of Political Economy, 99</em>(3), 483-499.</p>
+      <p class="ref-item">Menz, F. C., &amp; Vachon, S. (2006). The effectiveness of different policy regimes for promoting wind power. <em>Energy Policy, 34</em>(14), 1786-1796.</p>
+      <p class="ref-item">Midwest ISO. (2011). <em>MISO wind integration study.</em> Midcontinent Independent System Operator.</p>
+      <p class="ref-item">Pollin, R., Heintz, J., &amp; Garrett-Peltier, H. (2009). <em>The economic benefits of investing in clean energy.</em> PERI/Center for American Progress.</p>
+      <p class="ref-item">Porter, M. E. (1990). <em>The competitive advantage of nations.</em> Free Press.</p>
+      <p class="ref-item">Roback, J. (1982). Wages, rents, and the quality of life. <em>Journal of Political Economy, 90</em>(6), 1257-1278.</p>
+      <p class="ref-item">Sovacool, B. K., &amp; Watts, C. (2009). Going completely renewable: Is it possible? <em>The Electricity Journal, 22</em>(4), 95-111.</p>
+      <p class="ref-item">U.S. Census Bureau. (2025). <em>American Community Survey 5-Year Estimates.</em></p>
+      <p class="ref-item">U.S. Census Bureau. (2025). <em>Business Formation Statistics.</em></p>
+      <p class="ref-item">U.S. Department of Energy. (2024). <em>United States Energy and Employment Report.</em> Office of Policy.</p>
+      <p class="ref-item">U.S. Energy Information Administration. (2025). <em>Illinois state energy profile.</em></p>
+      <p class="ref-item">U.S. Energy Information Administration. (2025). <em>State Energy Data System.</em></p>
+      <p class="ref-item">Zillow Research. (2025). <em>Zillow Home Value Index.</em></p>
+    </div>
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('section').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
